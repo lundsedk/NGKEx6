@@ -16,7 +16,6 @@ Extended to support file server!
 #include <netinet/in.h>
 #include "iknlib.h"
 
-#define STRBUFSIZE 256
 #define READSIZE 1000
 
 void error(const char *msg)
@@ -85,6 +84,7 @@ int main(int argc, char *argv[])
 			fflush(stdout);
 
 			checkFileName();			//also readies the vars, image_size and image_data
+			sendFile();
 
 			printf("\nReturned from chechFileName");
 			fflush(stdout);
@@ -147,31 +147,52 @@ void checkFileName() {
 	bzero(readBuffer,sizeof(readBuffer));								//reset readBuffer
 
 	readTextTCP(connectedSocket,readBuffer,sizeof(readBuffer));
-		//was: readTextTCP(inSocket,readBuffer,sizeof(readBuffer));
-		//this is where we crash...
 
-	printf("\n readBuffer (filename?) read by checkFileName: %s\n", readBuffer);
-	fflush(stdout);
 
-	FILE* fp = fopen("/home/ase/Documents/oevelse6/Exercise6_template/Server/donkey.jpg", "rb");
-    fseek(fp, 0, SEEK_END);
-    image_size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-	image_data = (char*) malloc(image_size);
-    fread(image_data, 1, image_size, fp);
-    fclose(fp);
+	FILE* fp = fopen("readBuffer", "rb");
+	if (fp == nullptr ) {
+		printf("\n file: \"%s\" could not be found", readBuffer);
+		image_size = 0;
+		image_data = nullptr;
+	} else {
+		printf("\n reading file: \"%s\" ", readBuffer);
+		fflush(stdout);
 
-	//what to return?
-		//size - just manipulate global var - image_size
-		//file data in array - image_data
-	//send dummy test to client as first stab
+		fseek(fp, 0, SEEK_END);
+		image_size = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+		image_data = (char*) malloc(image_size);
+		fread(image_data, 1, image_size, fp);
+		fclose(fp);
+	}
+
 	printf("\ncheckFileName end");
 	fflush(stdout);
 };
 
 
 
-void sendFile(int clientSocket, const char* fileName, long fileSize)
+void sendFile()
 {
-	printf("Sending: %s, size: %li\n", fileName, fileSize);
+	//send image size, 0-term chars
+	char fileSizeC[255];
+	snprintf( fileSizeC, 255, "%d", image_size );
+	writeTextTCP(connectedSocket, fileSizeC);
+	printf("\nsendFile: sent file size of %s", fileSizeC);
+
+	//easier as loop - find the number of 1000-chunks, loop them, then do the remainder
+		//division of ints is "throws away remainder" - so... easy to implement?
+	//afterwards, send the remainder, then stop
+
+	unsigned int kiloChunks = image_size / 1000;
+	long unsigned int sendingIndex = 0;
+
+	for (; sendingIndex <= kiloChunks ; ++sendingIndex ) {
+		
+	}
+	//use sendingindex as start, use (image_size % 1000) as end
+
+
 }
+
+
