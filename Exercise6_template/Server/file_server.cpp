@@ -29,10 +29,10 @@ void error(const char *msg)
  * @param fileName Name of file to be sent to client
  * @param fileSize Size of file
  */
+
 void sendFile(int clientSocket, const char* fileName, long fileSize)
 {
 	printf("Sending: %s, size: %li\n", fileName, fileSize);
-   
 }
 
 int readSize = 1000;
@@ -85,19 +85,29 @@ int main(int argc, char *argv[])
     fclose(fp);
 
 
-	while(1) 
-	{
+	while(1) {
+		// structure
+			// listen
+			// getfilename
+			// testfilename
+				//send size 0
+				//send size, send filedata
 
 	printf("Accept...\n");
 		connectedSocket = accept(inSocket, (struct sockaddr *) &clientAddress, &clientAddressLength);
-		if (connectedSocket< 0) error("ERROR on accept");
-		else printf("Accepted\n");
+		if (connectedSocket< 0)
+			error("ERROR on accept");
+		else
+			printf("Accepted\n");
 
-		bzero(readBuffer,sizeof(readBuffer));//reset readBuffer
-		//read(connectedSocket,readBuffer,sizeof(readBuffer));
+		bzero(readBuffer,sizeof(readBuffer));		//reset readBuffer
 		readTextTCP(inSocket,readBuffer,sizeof(readBuffer));
+		printf("%s\n", readBuffer);
 
-		snprintf((char*)readBuffer, sizeof(readBuffer), "Recieved: %s",(char*)readBuffer);
+
+		snprintf((char*)readBuffer, sizeof(readBuffer), "Received: %s",(char*)readBuffer);
+			//virker ikke pt.
+
 		char fileSize[20];
 		sprintf(fileSize, "%ld", image_size);
 		sendFile(connectedSocket, fileSize,strlen(fileSize));
