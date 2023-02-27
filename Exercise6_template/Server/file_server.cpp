@@ -6,6 +6,7 @@ Modified: Michael Alrøe
 Extended to support file server!
 */
 
+#include <file_server.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,7 @@ Extended to support file server!
 #include "iknlib.h"
 
 #define STRBUFSIZE 256
+#define READSIZE 1000
 
 void error(const char *msg)
 {
@@ -30,12 +32,17 @@ void error(const char *msg)
  * @param fileSize Size of file
  */
 
-void sendFile(int clientSocket, const char* fileName, long fileSize)
-{
-	printf("Sending: %s, size: %li\n", fileName, fileSize);
-}
+//Global variables
+char readBuffer[READSIZE];
+char writeBuffer[READSIZE] = "test";									//remove "test"?
+int inSocket = socket(AF_INET, SOCK_STREAM, 0);
+sockaddr_in serverAddress;
+sockaddr_in clientAddress;
+int portnumber;
+int connectedSocket;
+long image_size = 0;
+char* image_data;
 
-int readSize = 1000;
 
 int main(int argc, char *argv[])
 {
@@ -46,19 +53,7 @@ int main(int argc, char *argv[])
 		error("ERROR usage: port");
 	}
 
-	char readText[readSize];
-	int inSocket = socket(AF_INET, SOCK_STREAM,0);
-	//	AF_INIT for IPv4, SOCK_STREAM for TCP, 0 for OS to chose protocol
-	if(inSocket<0){ error("ERROR opening socket");}
-
-	sockaddr_in serverAddress;
-	sockaddr_in clientAddress;
-	int portnumber;
-
-
-	readTextTCP(inSocket, readText, readSize);
-
-
+	if(inSocket<0){ error("ERROR opening socket");}						//check initialization of global var
 	bzero((char *) &serverAddress, sizeof(serverAddress)); //reset server address
 	portnumber = atoi(argv[1]); //portnumber = first argument 
 	serverAddress.sin_family = AF_INET; //IPv4
@@ -67,22 +62,11 @@ int main(int argc, char *argv[])
 	if (bind(inSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) 
 		{error("ERROR on binding");}
 
-	printf("Listen...\n");
+	printf("Listening for connection...\n");
+
+
 	listen(inSocket,2); //max 2 pending connections. ready to accept incoming connections
-	int connectedSocket;
 	socklen_t clientAddressLength = sizeof(clientAddress);
-
-	char readBuffer[readSize];
-	char writeBuffer[readSize] = "test";
-
-	
-	FILE* fp = fopen("/home/ase/Documents/oevelse6/Exercise6_template/Server/donkey.jpg", "rb");
-    fseek(fp, 0, SEEK_END);
-    long image_size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char* image_data = (char*) malloc(image_size);
-    fread(image_data, 1, image_size, fp);
-    fclose(fp);
 
 
 	while(1) {
@@ -93,20 +77,23 @@ int main(int argc, char *argv[])
 				//send size 0
 				//send size, send filedata
 
-	printf("Accept...\n");
-		connectedSocket = accept(inSocket, (struct sockaddr *) &clientAddress, &clientAddressLength);
+		connectedSocket = accept(inSocket, (struct sockaddr *) &clientAddress, &clientAddressLength);		// ?
 		if (connectedSocket< 0)
 			error("ERROR on accept");
 		else
-			printf("Accepted\n");
+			printf("Accepted (accept) active socket nr. %d\n", connectedSocket);
+			fflush(stdout);
 
-		bzero(readBuffer,sizeof(readBuffer));		//reset readBuffer
-		readTextTCP(inSocket,readBuffer,sizeof(readBuffer));
-		printf("%s\n", readBuffer);
+			checkFileName();			//also readies the vars, image_size and image_data
+
+			printf("\nReturned from chechFileName");
+			fflush(stdout);
+
+			//after sending, dealloc image data
 
 
-		snprintf((char*)readBuffer, sizeof(readBuffer), "Received: %s",(char*)readBuffer);
-			//virker ikke pt.
+		//snprintf((char*)readBuffer, sizeof(readBuffer), "Received: %s",(char*)readBuffer);
+			//virker ikke pt. - ser også farligt ud ifl. compiler
 
 		char fileSize[20];
 		sprintf(fileSize, "%ld", image_size);
@@ -149,4 +136,42 @@ int main(int argc, char *argv[])
 	close(inSocket);
 
 	return 0; 
+}
+
+
+
+void checkFileName() {
+	printf("\ncheckFileName start");
+	fflush(stdout);
+
+	bzero(readBuffer,sizeof(readBuffer));								//reset readBuffer
+
+	readTextTCP(connectedSocket,readBuffer,sizeof(readBuffer));
+		//was: readTextTCP(inSocket,readBuffer,sizeof(readBuffer));
+		//this is where we crash...
+
+	printf("\n readBuffer (filename?) read by checkFileName: %s\n", readBuffer);
+	fflush(stdout);
+
+	FILE* fp = fopen("/home/ase/Documents/oevelse6/Exercise6_template/Server/donkey.jpg", "rb");
+    fseek(fp, 0, SEEK_END);
+    image_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+	image_data = (char*) malloc(image_size);
+    fread(image_data, 1, image_size, fp);
+    fclose(fp);
+
+	//what to return?
+		//size - just manipulate global var - image_size
+		//file data in array - image_data
+	//send dummy test to client as first stab
+	printf("\ncheckFileName end");
+	fflush(stdout);
+};
+
+
+
+void sendFile(int clientSocket, const char* fileName, long fileSize)
+{
+	printf("Sending: %s, size: %li\n", fileName, fileSize);
 }
