@@ -54,6 +54,9 @@ int main(int argc, char *argv[])
 	printf("Please enter the message: ");
 	fgets((char*)buffer,sizeof(buffer),stdin);
 	n = write(sockfd,buffer,strlen((char*)buffer));  // socket write
+
+
+	
 	if (n < 0) 
 	    error("ERROR writing to socket");
 	
