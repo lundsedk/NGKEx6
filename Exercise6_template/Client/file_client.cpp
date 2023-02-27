@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 	printf("Please enter the message: ");
 	//fgets((char*)buffer,sizeof(buffer),stdin);
-	char newBuffer[] = "donkey.jpg";
+	char *newBuffer = argv[2];//"donkey.jpg";
 	writeTextTCP(sockfd,newBuffer);
 
 	//n = write(sockfd,buffer,strlen((char*)buffer));  // socket write
