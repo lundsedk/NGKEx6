@@ -6,6 +6,14 @@ Modified: Michael Alrøe
 Extended to support file server!
 */
 
+
+// Jeg har besluttet følgende om arkitekturen:
+//	Serveren sender "-1" når filen ikke findes.
+//	Klienten skal først modtage et null-termineret char array (som skal omformes til en int),
+//	...dernæst kommer et antal bytes lig denne int, uden nogen form for terminering eller pauser (lyt i loop)
+
+
+
 #include <file_server.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +40,7 @@ void error(const char *msg)
  */
 
 //Global variables
-char readBuffer[READSIZE];
+char fileName[READSIZE];
 char writeBuffer[READSIZE] = "test";									//remove "test"?
 int inSocket = socket(AF_INET, SOCK_STREAM, 0);
 sockaddr_in serverAddress;
@@ -92,13 +100,10 @@ int main(int argc, char *argv[])
 			//after sending, dealloc image data
 
 
-		//snprintf((char*)readBuffer, sizeof(readBuffer), "Received: %s",(char*)readBuffer);
-			//virker ikke pt. - ser også farligt ud ifl. compiler
-
-		char fileSize[20];
-		sprintf(fileSize, "%ld", image_size);
-		sendFile(connectedSocket, fileSize,strlen(fileSize));
-		writeTextTCP(connectedSocket,fileSize);
+		//char fileSize[20];
+		//sprintf(fileSize, "%ld", image_size);
+		//sendFile(connectedSocket, fileSize,strlen(fileSize));
+		//writeTextTCP(connectedSocket,fileSize);
 		//write(connectedSocket,writeBuffer,strlen((char*)writeBuffer));
 		//writeTextTCP(connectedSocket, fileSize);
 		//writeTextTCP(connectedSocket,image_data);
@@ -144,18 +149,16 @@ void checkFileName() {
 	printf("\ncheckFileName start");
 	fflush(stdout);
 
-	bzero(readBuffer,sizeof(readBuffer));								//reset readBuffer
+	bzero(fileName,sizeof(fileName));								//reset readBuffer / fileName
+	readTextTCP(connectedSocket,fileName,sizeof(fileName));
 
-	readTextTCP(connectedSocket,readBuffer,sizeof(readBuffer));
-
-
-	FILE* fp = fopen("readBuffer", "rb");
+	FILE* fp = fopen(fileName, "rb");
 	if (fp == nullptr ) {
-		printf("\n file: \"%s\" could not be found", readBuffer);
-		image_size = 0;
+		printf("\n file: \"%s\" could not be found", fileName);
+		image_size = -1;
 		image_data = nullptr;
 	} else {
-		printf("\n reading file: \"%s\" ", readBuffer);
+		printf("\n reading file: \"%s\" ", fileName);
 		fflush(stdout);
 
 		fseek(fp, 0, SEEK_END);
@@ -175,6 +178,7 @@ void checkFileName() {
 void sendFile()
 {
 	//send image size, 0-term chars
+	int n = 0;			//error handling
 	char fileSizeC[255];
 	snprintf( fileSizeC, 255, "%d", image_size );
 	writeTextTCP(connectedSocket, fileSizeC);
@@ -185,13 +189,22 @@ void sendFile()
 	//afterwards, send the remainder, then stop
 
 	unsigned int kiloChunks = image_size / 1000;
+	unsigned int remainderChunk = image_size % 1000;
 	long unsigned int sendingIndex = 0;
 
-	for (; sendingIndex <= kiloChunks ; ++sendingIndex ) {
-		
-	}
-	//use sendingindex as start, use (image_size % 1000) as end
+	// Send the kilochunks	
+	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
+		printf("\nSending %d out of %d packet of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
+		fflush(stdout);
 
+		strncpy(writeBuffer, image_data + sendingIndex, 1000);		//prep writebuffer 
+		n = write(connectedSocket, writeBuffer, 1000);				//send
+	}
+
+	// Send the remainder (note that sendingIndex is still the maximum that made it leave the loop, ie. kiloChunks)
+	printf("\nSending remainder, package of %d bytes of %s", remainderChunk, fileName);
+	strncpy(writeBuffer, image_data + sendingIndex, remainderChunk);		//prep writebuffer
+	n = write(connectedSocket, writeBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
 
 }
 
