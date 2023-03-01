@@ -13,6 +13,7 @@ Extended to support file client!
 #include <sys/socket.h>
 #include <netdb.h> 
 #include "iknlib.h"
+#include <string>
 
 #define STRBUFSIZE 1000
 
@@ -78,14 +79,45 @@ int main(int argc, char *argv[])
 	//n = read(sockfd,buffer,sizeof(buffer));  // socket read
 
 
-	while(1)
+	char AmountOfBytesToRecieve[7];
+	readTextTCP(sockfd,AmountOfBytesToRecieve, 7);
+	printf("bytesToRecieve %s\n", AmountOfBytesToRecieve);
+	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
+	printf("bytesToRecieve %d\n", BytesToRecieveInteger);
+	//int BytesToRecieve = itoi(AmountOfBytesToRecieve);
+
+/*
+	int buffer[1000];
+
+	int bytesLeft = BytesToRecieveInteger;
+	while (bytesLeft>0) 
 	{
-	n = recv(sockfd, buffer, sizeof(buffer), MSG_WAITALL);  // waits for full buffer or connection close
-	printf("%d\n",n);
-	if (n < 0) 
-	    error("ERROR reading from socket");
-	printf("\n%s\n",(char*)buffer);
+		read(sockfd, buffer, 1000);
+
+
+
 	}
+*/
+	FILE* fd = fopen("/home/ase/Documents/GitHub/NGKEx6/Exercise6_template/Client/emptyDonkeyFile.txt", "w");
+	int i = 0;
+	while(BytesToRecieveInteger > 0)
+	{
+	i++;
+	//n = recv(sockfd, buffer, sizeof(buffer), MSG_WAITALL);  // waits for full buffer or connection close
+	read(sockfd,buffer,1000);
+	fprintf(fd,"%s", buffer);
+	
+
+	printf("StringNumber:%d \n %s\n",i, buffer);
+	bzero(buffer,1000);
+	BytesToRecieveInteger -=1000;
+	//printf("%d\n",n);
+	//if (n < 0) 
+	//    error("ERROR reading from socket");
+	
+	}
+	fclose(fd);
+	
 
 
     printf("Closing client...\n\n");
