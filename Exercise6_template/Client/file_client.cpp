@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	struct hostent *server;
 	char buffer[BUFSIZE];
 
-	portno = PORT;//atoi(argv[2]);
+	portno = PORT;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) 
 	    error("ERROR opening socket");
@@ -66,44 +66,29 @@ int main(int argc, char *argv[])
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
 	    error("ERROR connecting");
 
-	printf("Please enter the message: ");
-	//fgets((char*)buffer,sizeof(buffer),stdin);
+	printf("writing file named: %s\n",argv[2]);
 	char *newBuffer = argv[2];//"donkey.jpg";
 	writeTextTCP(sockfd,newBuffer);
 
-	//n = write(sockfd,buffer,strlen((char*)buffer));  // socket write
-	//if (n < 0) 
-	//    error("ERROR writing to socket");
 	
     bzero(buffer,sizeof(buffer));
-	//n = read(sockfd,buffer,sizeof(buffer));  // socket read
 
 
 	char AmountOfBytesToRecieve[7];
 	readTextTCP(sockfd,AmountOfBytesToRecieve, 7);
 	printf("bytesToRecieve %s\n", AmountOfBytesToRecieve);
 	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
-	printf("bytesToRecieve %d\n", BytesToRecieveInteger);
-	//int BytesToRecieve = itoi(AmountOfBytesToRecieve);
+	printf("bytesToRecieve converted to integer %d\n", BytesToRecieveInteger);
 
-/*
-	int buffer[1000];
-
-	int bytesLeft = BytesToRecieveInteger;
-	while (bytesLeft>0) 
-	{
-		read(sockfd, buffer, 1000);
-
-
-
-	}
-*/
-	FILE* fd = fopen("/home/ase/Documents/GitHub/NGKEx6/Exercise6_template/Client/emptyDonkeyFile.txt", "w");
+	FILE* fd = fopen("emptyDonkeyFile.txt", "wb");
 	int i = 0;
+	if (fd == NULL) {
+		printf("error opening file\n");
+	}
+
 	while(BytesToRecieveInteger > 0)
 	{
 	i++;
-	//n = recv(sockfd, buffer, sizeof(buffer), MSG_WAITALL);  // waits for full buffer or connection close
 	read(sockfd,buffer,1000);
 	fprintf(fd,"%s", buffer);
 	
@@ -111,9 +96,7 @@ int main(int argc, char *argv[])
 	printf("StringNumber:%d \n %s\n",i, buffer);
 	bzero(buffer,1000);
 	BytesToRecieveInteger -=1000;
-	//printf("%d\n",n);
-	//if (n < 0) 
-	//    error("ERROR reading from socket");
+	
 	
 	}
 	fclose(fd);
