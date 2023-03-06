@@ -194,17 +194,23 @@ void sendFile()
 
 	// Send the kilochunks	
 	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
-		printf("\nSending %d out of %d packet of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
+		printf("\nSending %d out of %d packets of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
 		fflush(stdout);
 
-		strncpy(writeBuffer, image_data + sendingIndex, 1000);		//prep writebuffer 
+		//strncpy(writeBuffer, image_data + sendingIndex, 1000);		//prep writebuffer - not strncpy!
+		memcpy(writeBuffer, image_data + sendingIndex,1000);
+
 		n = write(connectedSocket, writeBuffer, 1000);				//send
+		usleep(5000);
+			// tested 5, 5000, 500,000 - slightly bigger file sometimes...
 	}
+
 
 	// Send the remainder (note that sendingIndex is still the maximum that made it leave the loop, ie. kiloChunks)
 	printf("\nSending remainder, package of %d bytes of %s", remainderChunk, fileName);
 	strncpy(writeBuffer, image_data + sendingIndex, remainderChunk);		//prep writebuffer
 	n = write(connectedSocket, writeBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
+	printf("Data as char in final writebuffer: %s", writeBuffer);
 
 }
 
