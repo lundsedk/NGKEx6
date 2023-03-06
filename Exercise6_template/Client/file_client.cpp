@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
 	
 
 	printf("StringNumber:%d \n %s\n",i, buffer);
+	printf("bytes left: %d \n", BytesToRecieveInteger);
 	bzero(buffer,1000);
 	BytesToRecieveInteger -=1000;
 	
