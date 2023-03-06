@@ -92,7 +92,16 @@ int main(int argc, char *argv[])
 	read(sockfd,buffer,1000);
 	//fprintf(fd,"%s", buffer);
 	//fwrite(fd,1000, buffer);
-	fwrite(buffer, sizeof(char), 1000, fd);
+
+	if (BytesToRecieveInteger > 1000)
+	{
+		fwrite(buffer, sizeof(char), 1000, fd);
+	}
+	else 
+	{
+		fwrite(buffer, sizeof(char), BytesToRecieveInteger, fd);
+	}
+	
 
 	
 	printf("StringNumber:%d \n %s\n",i, buffer);
