@@ -180,7 +180,7 @@ void sendFile()
 	//send image size, 0-term chars
 	int n = 0;			//error handling
 	char fileSizeC[255];
-	snprintf( fileSizeC, 255, "%d", image_size );
+	snprintf( fileSizeC, 255, "%ld", image_size );
 	writeTextTCP(connectedSocket, fileSizeC);
 	printf("\nsendFile: sent file size of %s", fileSizeC);
 
@@ -194,16 +194,17 @@ void sendFile()
 
 	// Send the kilochunks	
 	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
-		printf("\nSending %d out of %d packets of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
+		printf("\nSending %ld out of %d packets of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
 		fflush(stdout);
 
 		memcpy(writeBuffer, image_data + (sendingIndex * 1000),1000);
 
 		n = write(connectedSocket, writeBuffer, 1000);				//send
-			//this seems to crash around packet 112-113...
+			//this seems to crash around packet 112-113... if 5000 microsecs wait or more...
 
-		usleep(5000);
+		usleep(5);
 			// tested 5, 5000, 500,000 - slightly bigger file sometimes...
+			// 5 means every package gets sent
 		bzero(writeBuffer, 1000);
 			//necessary?
 	}
@@ -213,7 +214,7 @@ void sendFile()
 	printf("\nSending remainder, package of %d bytes of %s", remainderChunk, fileName);
 	memcpy(writeBuffer, image_data + (sendingIndex * 1000), remainderChunk);		//prep writebuffer
 	n = write(connectedSocket, writeBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
-	printf("Data as char in final writebuffer: %s", writeBuffer);
+		printf("Data as char in final writebuffer: %s", writeBuffer);
 
 }
 
