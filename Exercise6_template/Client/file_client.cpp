@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
 	printf("bytesToRecieve converted to integer %d\n", BytesToRecieveInteger);
 
-	FILE* fd = fopen("emptyDonkeyFile.txt", "wb");
+	FILE* fd = fopen(argv[2], "wb");
 	int i = 0;
 	if (fd == NULL) {
 		printf("error opening file\n");
