@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
 	printf("bytesToRecieve converted to integer %d\n", BytesToRecieveInteger);
 
-	FILE* fd = fopen("emptyDonkeyFile.txt", "wb");
+	FILE* fd = fopen(argv[2], "wb");
 	int i = 0;
 	if (fd == NULL) {
 		printf("error opening file\n");
@@ -92,7 +92,16 @@ int main(int argc, char *argv[])
 	read(sockfd,buffer,1000);
 	//fprintf(fd,"%s", buffer);
 	//fwrite(fd,1000, buffer);
-	fwrite(buffer, sizeof(char), 1000, fd);
+
+	if (BytesToRecieveInteger > 1000)
+	{
+		fwrite(buffer, sizeof(char), 1000, fd);
+	}
+	else 
+	{
+		fwrite(buffer, sizeof(char), BytesToRecieveInteger, fd);
+	}
+	
 
 	
 	printf("StringNumber:%d \n %s\n",i, buffer);
@@ -103,6 +112,7 @@ int main(int argc, char *argv[])
 	
 	
 	}
+	usleep(5000000);
 	fclose(fd);
 	
 
