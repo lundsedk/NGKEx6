@@ -1,20 +1,5 @@
-/* A simple server in the internet domain using TCP
-The port number is passed as an argument 
-Based on example: https://www.linuxhowtos.org/C_C++/socket.htm 
 
-Modified: Michael Alrøe
-Extended to support file server!
-*/
-
-
-// Jeg har besluttet følgende om arkitekturen:
-//	Serveren sender "-1" når filen ikke findes.
-//	Klienten skal først modtage et null-termineret char array (som skal omformes til en int),
-//	...dernæst kommer et antal bytes lig denne int, uden nogen form for terminering eller pauser (lyt i loop)
-
-
-
-#include <file_server.h>
+#include "file_server.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,12 +62,6 @@ int main(int argc, char *argv[])
 
 
 	while(1) {
-		// structure
-			// listen
-			// getfilename
-			// testfilename
-				//send size 0
-				//send size, send filedata
 
 		connectedSocket = accept(inSocket, (struct sockaddr *) &clientAddress, &clientAddressLength);		// ?
 		if (connectedSocket< 0)
@@ -97,40 +76,11 @@ int main(int argc, char *argv[])
 			printf("\nReturned from chechFileName");
 			fflush(stdout);
 
-			//after sending, dealloc image data
-
-
-		//char fileSize[20];
-		//sprintf(fileSize, "%ld", image_size);
-		//sendFile(connectedSocket, fileSize,strlen(fileSize));
-		//writeTextTCP(connectedSocket,fileSize);
-		//write(connectedSocket,writeBuffer,strlen((char*)writeBuffer));
-		//writeTextTCP(connectedSocket, fileSize);
-		//writeTextTCP(connectedSocket,image_data);
-		
-		//send(connectedSocket, image_data, image_size, 0);
-		
-		//sendFile(connectedSocket, image_data, image_size);
 		long bytesLeft = image_size;
-		//writeTextTCP("%ld", image_size);
-		
-		
-
-		//writeBuffer[image_size] = image_data[0];
-		//writeTextTCP(connectedSocket, writeBuffer);
-
 		
 
 		while(bytesLeft > 0) 
 		{
-			//writeTextTCP()
-
-
-			//write(inSocket, image_data +(image_size-bytesLeft), bytesLeft > 1000 ? 1000 : bytesLeft);
-			//writeTextTCP(connectedSocket, writeBuffer);
-			//sendFile(connectedSocket, image_data +(image_size-bytesLeft), bytesLeft > 1000 ? 1000 : bytesLeft);
-			//send(connectedSocket, image_data +(image_size-bytesLeft), bytesLeft > 1000 ? 1000 : bytesLeft, 0);
-
 			bytesLeft -= 1000;
 		}
 
@@ -181,10 +131,6 @@ void sendFile()
 	snprintf( fileSizeC, 255, "%ld", image_size );
 	writeTextTCP(connectedSocket, fileSizeC);
 	printf("\nsendFile: sent file size of %s", fileSizeC);
-
-	//easier as loop - find the number of 1000-chunks, loop them, then do the remainder
-		//division of ints is "throws away remainder" - so... easy to implement?
-	//afterwards, send the remainder, then stop
 
 	unsigned int kiloChunks = image_size / 1000;
 	unsigned int remainderChunk = image_size % 1000;
