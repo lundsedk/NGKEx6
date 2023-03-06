@@ -77,31 +77,28 @@ int main(int argc, char *argv[])
 	char AmountOfBytesToRecieve[7];
 	readTextTCP(sockfd,AmountOfBytesToRecieve, 7);
 	printf("bytesToRecieve %s\n", AmountOfBytesToRecieve);
-	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
-	printf("bytesToRecieve converted to integer %d\n", BytesToRecieveInteger);
+	int BytesToReceiveInteger = std::stoi(AmountOfBytesToRecieve);
+	printf("bytesToRecieve converted to integer %d\n", BytesToReceiveInteger);
 
 	FILE* fd = fopen("emptyDonkeyFile.txt", "wb");
+																								//ændr filenavn udfra param
 	int i = 0;
 	if (fd == NULL) {
 		printf("error opening file\n");
 	}
 
-	while(BytesToRecieveInteger > 0)
+	while(BytesToReceiveInteger > 0)
 	{
-	i++;
-	read(sockfd,buffer,1000);
-	fprintf(fd,"%s", buffer);
-	
+		i++;
+		read(sockfd,buffer,1000);
+		fprintf(fd,"%s", buffer);
 
-	printf("StringNumber:%d \n %s\n",i, buffer);
-	bzero(buffer,1000);
-	BytesToRecieveInteger -=1000;
-	
-	
+		printf("StringNumber:%d, BytesToReceiveInteger is: %d \n %s\n",i, BytesToReceiveInteger, buffer);
+		bzero(buffer,1000);
+		BytesToReceiveInteger -=1000;
 	}
-	fclose(fd);
-	
 
+	fclose(fd);
 
     printf("Closing client...\n\n");
 	close(sockfd);
