@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	    error("ERROR writing to socket");
 	
     bzero(buffer,sizeof(buffer));
-	//n = read(sockfd,buffer,sizeof(buffer));  // socket read
+	n = read(sockfd,buffer,sizeof(buffer));  // socket read
 
 
 

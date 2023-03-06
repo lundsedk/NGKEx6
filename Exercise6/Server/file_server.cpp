@@ -134,8 +134,6 @@ int main(int argc, char *argv[])
 			bytesLeft -= 1000;
 		}
 
-		
-		
 		close(connectedSocket);
 	}
 	close(inSocket);
@@ -205,23 +203,16 @@ void sendFile()
 			}
 				fflush(stdout);
 
-
-
 			//this seems to crash around packet 112-113... if 5000 microsecs wait or more...
 
 		usleep(5);
-			// tested 5, 5000, 500,000 - slightly bigger file sometimes...
-			// 5 means every package gets sent
-		bzero(writeBuffer, 1000);
-			//necessary?
 	}
-
 
 	// Send the remainder (note that sendingIndex is still the maximum that made it leave the loop, ie. kiloChunks)
 	printf("\nSending remainder, package of %d bytes of %s", remainderChunk, fileName);
 	memcpy(writeBuffer, image_data + (sendingIndex * 1000), remainderChunk);		//prep writebuffer
 	n = write(connectedSocket, writeBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
-		printf("Data as char in final writebuffer: %s", writeBuffer);
+		printf("\nData as char in final writebuffer: %s", writeBuffer);
 
 }
 
