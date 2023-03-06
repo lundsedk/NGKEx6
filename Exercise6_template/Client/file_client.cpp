@@ -90,11 +90,14 @@ int main(int argc, char *argv[])
 	{
 	i++;
 	read(sockfd,buffer,1000);
-	fprintf(fd,"%s", buffer);
-	
+	//fprintf(fd,"%s", buffer);
+	//fwrite(fd,1000, buffer);
+	fwrite(buffer, sizeof(char), 1000, fd);
 
+	
 	printf("StringNumber:%d \n %s\n",i, buffer);
-	printf("bytes left: %d \n", BytesToRecieveInteger);
+	printf("Bytes left to read: %d\n", BytesToRecieveInteger);
+
 	bzero(buffer,1000);
 	BytesToRecieveInteger -=1000;
 	
