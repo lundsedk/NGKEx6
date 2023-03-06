@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
 	
 	
 	}
+	usleep(5000000);
 	fclose(fd);
 	
 

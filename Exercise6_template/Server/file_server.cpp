@@ -194,12 +194,19 @@ void sendFile()
 
 	// Send the kilochunks	
 	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
-		printf("\nSending %ld out of %d packets of 1000 bytes of %s", sendingIndex + 1, kiloChunks, fileName);
-		fflush(stdout);
 
 		memcpy(writeBuffer, image_data + (sendingIndex * 1000),1000);
 
 		n = write(connectedSocket, writeBuffer, 1000);				//send
+			if (n == -1){
+				printf("\nwrite() returned -1");
+			} else {
+				printf("\nSending %ld out of %d packets - %d bytes of 1000 sent", sendingIndex + 1, kiloChunks, n);
+			}
+				fflush(stdout);
+
+
+
 			//this seems to crash around packet 112-113... if 5000 microsecs wait or more...
 
 		usleep(5);
