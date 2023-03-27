@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 	usleep(5000000);
 	fclose(fd);
 	
-    printf(\n"Closing client...\n");
+    printf("\nClosing client...\n");
 	close(sockfd);
 	return 0;
 }
