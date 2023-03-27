@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	while(BytesToReceiveInteger > 0) {
 		i++;
 
-		usleep(10000);
+		usleep(1000);
 			//***debug attempt
 
 		read(sockfd,buffer,1000);
@@ -109,7 +109,6 @@ int main(int argc, char *argv[])
 		// Fix here:
 		printf("\nReceiving chunk %d, %d bytes remaining", i, BytesToReceiveInteger);
 
-		//bzero(buffer,1000);				where the 0's came from?
 		BytesToReceiveInteger -=1000;
 	
 	
