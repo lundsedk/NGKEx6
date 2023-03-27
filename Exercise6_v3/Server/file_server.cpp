@@ -101,8 +101,8 @@ void transferFile() {												// Fix: ændret navn og funktion - transferFile
 	// Initialize for the given file:
 	fseek(fp, 0, SEEK_END);
 	image_size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	kiloChunks = image_size / 1000;								// How many chunks of 1000
+	fseek(fp, 0, SEEK_SET);										// Set fp to beginning of file
+	kiloChunks = image_size / 1000;								// How many "full" chunks of 1000 (131 for test file)
 	remainderChunk = image_size % 1000;							// Size of the remaining chunk (less than 1000)
 
 	// Sending file size
@@ -112,24 +112,37 @@ void transferFile() {												// Fix: ændret navn og funktion - transferFile
 	printf("\nsendFile: sent file size of %s", fileSizeC);
 
 	// Sending file
-	sendingIndex = 0;
-	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
-		printf("\nSending %ld out of %d packets", sendingIndex + 1, kiloChunks+1);
+	sendingIndex = 1;
+	for (; sendingIndex <= kiloChunks ; ++sendingIndex ) {
+		printf("\nSending %ld out of %d packets (size %d)", sendingIndex, kiloChunks+1, 1000);
+		fflush(stdout);
 		transferChunk(1000);
 	}
+	printf("\nSending %ld out of %d packets (size %d)", sendingIndex, kiloChunks+1, remainderChunk);
+	fflush(stdout);
 	transferChunk(remainderChunk);
-		printf("\nSending %ld out of %d packets", sendingIndex + 1, kiloChunks+1);
 };
 
 void transferChunk(unsigned int chunkSize) {					// Sender 1000 (eller mindre) bytes, flytter fp offset
 	char sendBuffer[1000];
-	int n = 0;													// error handling
+	int n,m = 0;													// error handling
 
-	fread(sendBuffer, 1, chunkSize, fp);						// Read file, move fp offset
+	m = fread(sendBuffer, 1, chunkSize, fp);						// Read file, move fp offset
+		//could this be the source?
+		printf("\nfread read %d bytes", m);
+		fflush(stdout);
 
 	n = write(connectedSocket, sendBuffer, chunkSize);			// Send
+			/* Write N bytes of BUF to FD.  Return the number written, or -1.
+			This function is a cancellation point and therefore not marked with
+			__THROW.  */
+		//seems fine, writes the expected number of bytes...
+
 	if (n == -1){
 		printf("\nError on write, write() returned -1");
 		fflush(stdout);
 	}
+	usleep(1000);												// *** test (1.000.000 still has errors...)
+
+	//maybe just do a malloc, so sendbuffer has correct size?
 }

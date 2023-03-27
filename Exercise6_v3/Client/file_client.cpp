@@ -104,13 +104,11 @@ int main(int argc, char *argv[])
 		// Fix here:
 		printf("\nReceiving chunk %d, %d bytes remaining", i, BytesToRecieveInteger);
 
-
 		bzero(buffer,1000);
 		BytesToRecieveInteger -=1000;
 	
 	
 	}
-	usleep(5000000);
 	fclose(fd);
 	
     printf("\nClosing client...\n");
