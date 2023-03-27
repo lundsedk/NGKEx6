@@ -129,8 +129,7 @@ void transferChunk(unsigned int chunkSize) {					// Sender 1000 (eller mindre) b
 
 	m = fread(sendBuffer, 1, chunkSize, fp);						// Read file, move fp offset
 		//could this be the source?
-		printf("\nfread read %d bytes", m);
-		fflush(stdout);
+		//returns expected no of read bytes
 
 	n = write(connectedSocket, sendBuffer, chunkSize);			// Send
 			/* Write N bytes of BUF to FD.  Return the number written, or -1.
@@ -142,7 +141,7 @@ void transferChunk(unsigned int chunkSize) {					// Sender 1000 (eller mindre) b
 		printf("\nError on write, write() returned -1");
 		fflush(stdout);
 	}
-	usleep(1000);												// *** test (1.000.000 still has errors...)
+	usleep(100);												// *** test (1.000.000 still has errors...)
 
 	//maybe just do a malloc, so sendbuffer has correct size?
 }

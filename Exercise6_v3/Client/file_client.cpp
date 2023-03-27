@@ -79,8 +79,9 @@ int main(int argc, char *argv[])
 	char AmountOfBytesToRecieve[7];
 	readTextTCP(sockfd,AmountOfBytesToRecieve, 7);
 	printf("bytesToRecieve %s\n", AmountOfBytesToRecieve);
-	int BytesToRecieveInteger = std::stoi(AmountOfBytesToRecieve);
-	printf("bytesToRecieve converted to integer %d\n", BytesToRecieveInteger);
+	int BytesToReceiveInteger = std::stoi(AmountOfBytesToRecieve);
+	printf("bytesToRecieve converted to integer %d\n", BytesToReceiveInteger);
+	if (BytesToReceiveInteger == 0) {return 0;}
 
 	FILE* fd = fopen(argv[2], "wb");
 	int i = 0;
@@ -88,24 +89,28 @@ int main(int argc, char *argv[])
 		printf("error opening file\n");
 	}
 
-	while(BytesToRecieveInteger > 0) {
+	while(BytesToReceiveInteger > 0) {
 		i++;
+
+		usleep(10000);
+			//***debug attempt
+
 		read(sockfd,buffer,1000);
 
-		if (BytesToRecieveInteger > 1000)
+		if (BytesToReceiveInteger > 1000)
 		{
 			fwrite(buffer, sizeof(char), 1000, fd);
 		}
 		else 
 		{
-			fwrite(buffer, sizeof(char), BytesToRecieveInteger, fd);
+			fwrite(buffer, sizeof(char), BytesToReceiveInteger, fd);
 		}
-		
-		// Fix here:
-		printf("\nReceiving chunk %d, %d bytes remaining", i, BytesToRecieveInteger);
 
-		bzero(buffer,1000);
-		BytesToRecieveInteger -=1000;
+		// Fix here:
+		printf("\nReceiving chunk %d, %d bytes remaining", i, BytesToReceiveInteger);
+
+		//bzero(buffer,1000);				where the 0's came from?
+		BytesToReceiveInteger -=1000;
 	
 	
 	}
