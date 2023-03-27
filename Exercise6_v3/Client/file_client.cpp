@@ -1,6 +1,7 @@
 /*
-Ændret til genaflevering
-Debug-statements fjernet (char-udskrift af modtagne bits)
+Genaflev. øv 6 - klient del.
+Fjernet debug-statemenst der printede modtagne bits som chars.
+Søg "fix" for vigtige ændringer.
 */
 
 #include <stdio.h>
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
 	    error("ERROR connecting");
 
 	printf("writing file named: %s\n",argv[2]);
-	char *newBuffer = argv[2];
+	char *newBuffer = argv[2];//"donkey.jpg";
 	writeTextTCP(sockfd,newBuffer);
 
 	
@@ -95,14 +96,20 @@ int main(int argc, char *argv[])
 		{
 			fwrite(buffer, sizeof(char), BytesToRecieveInteger, fd);
 		}
-
+		
+		// Fix here:
 		printf("\nReceiving chunk %d, %d bytes remaining", i, BytesToRecieveInteger);
+
 
 		bzero(buffer,1000);
 		BytesToRecieveInteger -=1000;
+	
+	
 	}
 	usleep(5000000);
 	fclose(fd);
+	
+
 
     printf("Closing client...\n\n");
 	close(sockfd);
