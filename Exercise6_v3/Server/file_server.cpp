@@ -1,9 +1,6 @@
 //	Genaflevering, vigtige ændringer markeret med "fix" i kommentarer
 
 
-//***
-//	krav - iterativ? ja - må gerne være samme klient
-
 #include "file_server.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,13 +79,12 @@ int main(int argc, char *argv[])
 	return 0; 
 }
 
-void transferFile() {												//Fix: ændret navn og funktion - transferFile står får både:
+void transferFile() {												// Fix: ændret navn og funktion - transferFile håndterer:
+																	//	Åbning/lukning af fil, sender fil-størrelse, og loop-logikken
 	unsigned int kiloChunks;
 	unsigned int remainderChunk;
 	long unsigned int sendingIndex;
 	int n = 0;			//error handling
-
-																	// filnavn-check, åbning af fil, loop over read/send
 
 	// Resetting file name, opening file
 	bzero(fileName,sizeof(fileName));								
@@ -106,8 +102,8 @@ void transferFile() {												//Fix: ændret navn og funktion - transferFile 
 	fseek(fp, 0, SEEK_END);
 	image_size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	kiloChunks = image_size / 1000;					// How many chunks of 1000
-	remainderChunk = image_size % 1000;				// Size of the remaining chunk (less than 1000)
+	kiloChunks = image_size / 1000;								// How many chunks of 1000
+	remainderChunk = image_size % 1000;							// Size of the remaining chunk (less than 1000)
 
 	// Sending file size
 	char fileSizeC[255];
@@ -125,19 +121,15 @@ void transferFile() {												//Fix: ændret navn og funktion - transferFile 
 		printf("\nSending %ld out of %d packets", sendingIndex + 1, kiloChunks+1);
 };
 
-void transferChunk(unsigned int chunkSize) {
+void transferChunk(unsigned int chunkSize) {					// Sender 1000 (eller mindre) bytes, flytter fp offset
 	char sendBuffer[1000];
-	int n = 0; //error handling
+	int n = 0;													// error handling
 
-	//to parts:
-	//	read chunkSize bytes of data into some local temp array
-	//	send that temp array
+	fread(sendBuffer, 1, chunkSize, fp);						// Read file, move fp offset
 
-	fread(sendBuffer, 1, chunkSize, fp);					// Read file, move fp
-
-	n = write(connectedSocket, sendBuffer, chunkSize);		// Send
+	n = write(connectedSocket, sendBuffer, chunkSize);			// Send
 	if (n == -1){
-		printf("\nError, write() returned -1");
+		printf("\nError on write, write() returned -1");
 		fflush(stdout);
 	}
 }

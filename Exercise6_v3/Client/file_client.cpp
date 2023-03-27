@@ -4,6 +4,10 @@ Fjernet debug-statemenst der printede modtagne bits som chars.
 Søg "fix" for vigtige ændringer.
 */
 
+
+///*** search
+//	also, handling file not found...
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -109,9 +113,7 @@ int main(int argc, char *argv[])
 	usleep(5000000);
 	fclose(fd);
 	
-
-
-    printf("Closing client...\n\n");
+    printf(\n"Closing client...\n");
 	close(sockfd);
 	return 0;
 }
