@@ -1,5 +1,5 @@
 SOURCES= file_client.cpp iknlib.cpp
-EXE = prog
+EXE = file_client
 CXXFLAGS =-I. 
 ARCH?=x86-64
 ifeq (${ARCH},x86-64) 
