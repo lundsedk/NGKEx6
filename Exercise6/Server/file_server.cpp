@@ -26,7 +26,7 @@ void error(const char *msg)
 
 //Global variables
 char fileName[READSIZE];
-char writeBuffer[READSIZE] = "test";									//remove "test"?
+char sendBuffer[READSIZE] = "test";									//remove "test"?
 int inSocket = socket(AF_INET, SOCK_STREAM, 0);
 sockaddr_in serverAddress;
 sockaddr_in clientAddress;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 			printf("Accepted (accept) active socket nr. %d\n", connectedSocket);
 			fflush(stdout);
 
-			checkFileName();			//also readies the vars, image_size and image_data
+			transferFile();			//also readies the vars, image_size and image_data
 			sendFile();
 
 			printf("\nReturned from chechFileName");
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
 
 
-void checkFileName() {
+void transferFile() {
 	printf("\ncheckFileName start");
 	fflush(stdout);
 
@@ -139,9 +139,9 @@ void sendFile()
 	// Send the kilochunks	
 	for (; sendingIndex < kiloChunks ; ++sendingIndex ) {
 
-		memcpy(writeBuffer, image_data + (sendingIndex * 1000),1000);
+		memcpy(sendBuffer, image_data + (sendingIndex * 1000),1000);
 
-		n = write(connectedSocket, writeBuffer, 1000);				//send
+		n = write(connectedSocket, sendBuffer, 1000);				//send
 			if (n == -1){
 				printf("\nwrite() returned -1");
 			} else {
@@ -156,9 +156,9 @@ void sendFile()
 
 	// Send the remainder (note that sendingIndex is still the maximum that made it leave the loop, ie. kiloChunks)
 	printf("\nSending remainder, package of %d bytes of %s", remainderChunk, fileName);
-	memcpy(writeBuffer, image_data + (sendingIndex * 1000), remainderChunk);		//prep writebuffer
-	n = write(connectedSocket, writeBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
-		printf("\nData as char in final writebuffer: %s", writeBuffer);
+	memcpy(sendBuffer, image_data + (sendingIndex * 1000), remainderChunk);		//prep writebuffer
+	n = write(connectedSocket, sendBuffer, remainderChunk);				//send (ignoring everything after reminderChunk index)
+		printf("\nData as char in final writebuffer: %s", sendBuffer);
 
 }
 

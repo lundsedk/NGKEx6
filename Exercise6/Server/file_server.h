@@ -1,4 +1,4 @@
 
 
-void checkFileName();
+void transferFile();
 void sendFile();

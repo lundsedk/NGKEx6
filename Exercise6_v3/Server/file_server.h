@@ -1,4 +1,4 @@
 
 
-void checkFileName();
-void sendFile();
+void transferFile();
+void transferChunk(unsigned int chunkSize);
